@@ -1,0 +1,109 @@
+uniform vec3      iResolution;           // viewport resolution (in pixels)
+uniform float     iGlobalTime;           // shader playback time (in seconds)
+uniform float     iGlobalTimeDelta;            // render time (in seconds)
+uniform int       iFrame;                // shader playback frame
+uniform float     iChannelTime[4];       // channel playback time (in seconds)
+uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)
+uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
+uniform vec4      iDate;                 // (year, month, day, time in seconds)
+
+mat2 rot( in float a ) {
+	float c = cos(a),
+        s = sin(a);
+    return mat2(c, s, -s, c);
+}
+
+float sdEllipsoid( in vec2 p, in vec2 r )
+{
+    return (length( p/r ) - 1.0) * min(r.x,r.y);
+}
+
+float sdStrip( in vec2 uv, in float angle, in float size ) {
+	vec2 uvS = 10. * rot(angle) * uv;
+    return max(uv.x - uvS.x - size, -uv.x + uvS.x - size);
+}
+
+float swipe( in float period, in float bmin, in float bmax ) {
+    float s = 2. * max(mod(iGlobalTime, 2. * period) - period, 0.) - period;
+    //return s;
+    return (((s / period) + 1.) * .5 * (bmax - bmin)) + bmin;
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord.xy / iResolution.xy;
+	float E = 1./iResolution.y;
+
+    // aspect x
+    uv -= 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+
+    // background
+    vec3 c = vec3(1., .2, .5);
+
+    // right ear - ellipsoid inner + outer
+    vec2 rext = vec2(.3, .8),
+        rint = rext - .2;
+    float angle = 0.5 + (0.035 + 0.05 * cos(iGlobalTime + 1.));
+    vec2 uvE = rot(angle) * uv;
+    uvE *= 4.0;
+    uvE += vec2(-0.2, -0.7);
+    float d = sdEllipsoid(uvE, rint);
+    float r = step(d, 0.);
+    c = mix(c, vec3(1., 0.58, 0.75), r);
+    d = max(sdEllipsoid(uvE, rext), -d);
+    r = smoothstep(.01, .0, d);
+    c = mix(c, vec3(1.), r);
+
+    // left ear - ellipsoid inner + outer
+    angle = 0.37 + (0.05 + 0.05 * sin(iGlobalTime * 1.05));
+    vec2 uvEb = uv * rot(angle);
+    uvEb *= 4.0;
+    uvEb += vec2(0.2, -0.7);
+    d = sdEllipsoid(uvEb, rint);
+    r = step(d, 0.);
+    c = mix(c, vec3(1., 0.58, 0.75), r);
+    d = max(sdEllipsoid(uvEb, rext), -d);
+    r = smoothstep(.01, .0, d);
+    c = mix(c, vec3(1.), r);
+
+    // head - circle
+    vec2 uvT = uv * 1.5;
+    uvT.y += 0.2;
+    d = length(uvT);
+    r = smoothstep(.31, .30, d); // [0., 1.]
+    c = mix(c, vec3(1.), r);
+
+    // vertical swiping strip
+    vec2 uvS = uv + swipe(1., 2., -2.);
+    d = sdStrip(uvS, 0.3, 2.);
+    r = smoothstep(E + 0.05, E, d);
+    c = mix(c, vec3(1.) - c, r);
+    for(int i = 0; i < 4; i++) {
+        uvS = uv + swipe(float(i * 2.), 2., -2.);
+        d = sdStrip(uvS, 0.3, i / 2.);
+        r = smoothstep(E + 0.05, E, d);
+        c = mix(c, 1. - c, r);
+    }
+
+	fragColor = vec4(c, 1.);
+}
+
+    // alternative way to make an ear - rebased circle
+    /*vec2 uvO = uv;
+    uvO *= rot(0.5);
+    uvO.x *= 3.;
+    uvO *= 1.5;
+    uvO.y -= 0.28;
+    uvO.x += 0.29;
+    float d = length(uvO);
+    float r = smoothstep(.31, .30, d); // [0., 1.]
+    c = mix(c, vec3(1.0, 0.79, 0.89), r);*/
+
+void main() {
+	vec4 color;
+	mainImage(color, gl_FragCoord.xy);
+
+	color.w = 1.0;
+	gl_FragColor = color;
+}
