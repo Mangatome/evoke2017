@@ -15,9 +15,11 @@ float sdEllipsoid( in vec2 p, in vec2 r )
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
 	// Constants
+	float PI = 3.14159265359;
 	float shakeAmpSpeed = 20.;
 	float headSize = 1.5;
 	float fluffyness = .2;
+	vec3 black = vec3(0., 0., 0.);
 	vec3 white = vec3(1., 1., 1.);
 	vec3 pink = vec3(1., 0.58, 0.75);
 
@@ -39,16 +41,22 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tExplode = smoothstep(35., 37., it);
     float tShowRab = smoothstep(37., 38., it);
 
+    // Scene management
     float scene2 = step(1, tExplode);
     float scene1 = 1 - scene2;
 
     vec3 rabbitColor = white * scene1 + pink * scene2;
     vec3 earColor = pink * scene1 + white * scene2;
 
+    // Zoom scene
     uv *= 1 - tExplode * 1 + scene2;
 
-    // background
-    vec3 c = mix(vec3(0.), vec3(1., .2, .5), tPink);
+    // Pan scene
+    uv += vec2(.2, .55) * scene2;
+    uv = uv * scene1 + uv * rot(PI * -.1) * scene2;
+
+    // Background color
+    vec3 c = mix(black, vec3(1., .2, .5), tPink);
     c = mix(c, white, scene2);
 
     // Ear size
@@ -67,7 +75,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     r = smoothstep(.01, .0, d);
     c = mix(c, rabbitColor, r);
 
-    // left ear - ellipsoid inner + outerx
+    // left ear - ellipsoid inner + outer
     angle = 0.37 + (0.05 + 0.05 * sin(it * 1.05));
     uvx = uv * rot(angle);
     uvx *= 4.0;
@@ -92,9 +100,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     r = smoothstep(.32 + fluffyH * tFluffyH, .30, d); // [0., 1.]
     c = mix(c, rabbitColor, r);
 
-    // Small rabbit
-
-
+    // return
 	fragColor = vec4(c, 1.);
 }
 
