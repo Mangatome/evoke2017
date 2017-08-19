@@ -182,7 +182,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     		1 + amplitude * cos(it * shakeAmpSpeed),
 			1 + amplitude * sin(it * shakeAmpSpeed)
     ));
-    r = smoothstep(.32 + fluffyH * tFluffyH, .30, d); // [0., 1.]
+    r = smoothstep(.32 + fluffyH * tFluffyH + .05 / tAppearH, .30, d); // [0., 1.]
     c = mix(c, rabbitColor, r);
 
     // Swipe
