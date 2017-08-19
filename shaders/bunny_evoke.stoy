@@ -20,8 +20,8 @@ float sdEllipsoid( in vec2 p, in vec2 r )
 float sdRay(in vec2 p, in float width, in float angle, in float lgbth) {
 	float a = atan(p.y,p.x)/6.28318531;
 	float diff = abs(angle - a);
-	float ray = smoothstep(diff, diff + width * .5, width);
-	return ray * smoothstep(length(p), length(p) + width, lgbth);
+	float ray = smoothstep(diff, diff + width, width);
+	return ray * smoothstep(length(p), length(p) + width * 2, lgbth);
 }
 
 float rd(vec2 p, float x) {
@@ -69,6 +69,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	// Tweak here!
 	float shakeAmpSpeed = 20.;
 	float headSize = 1.5;
+	float growHFactor = .025;
 	float fluffynessH = .2;
 	float fluffynessLR = .02;
 	float fluffyPeriod = .5;
@@ -103,6 +104,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tRays = smoothstep(13., 17., it) * smoothstep(24., 20., it);
     float tSwipes = step(13.4, it) * step(it, 20);
     float tOffsetH = smoothstep(22.3, 24., it);
+    float tGrowH = smoothstep(24., 24.1, it);
+    float tReduceH = smoothstep(24.1, 24.6, it);
     float tAppearL = smoothstep(25.4, 25.9, it);
     float tAppearR = smoothstep(27., 27.5, it);
     float tAppearML1 = smoothstep(30.4, 30.9, it);
@@ -204,7 +207,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     d = sdEllipsoid(uvx, headSize * vec2(
     		1 + amplitude * cos(it * shakeAmpSpeed),
 			1 + amplitude * sin(it * shakeAmpSpeed)
-    ));
+    ) * (1 + (tGrowH - tReduceH) * growHFactor));
     r = smoothstep(.32 + fluffyH * tFluffyH + .05 / tAppearH, .30, d); // [0., 1.]
     c = mix(c, rabbitColor, r);
 
