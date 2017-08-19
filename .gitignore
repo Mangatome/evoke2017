@@ -4,6 +4,7 @@ out/
 *.wav
 *.pkf
 *.mp3
+*.png
 
 .metadata
 bin/
