@@ -1,11 +1,5 @@
-uniform vec3      iResolution;           // viewport resolution (in pixels)
+uniform vec3 iResolution;           // viewport resolution (in pixels)
 uniform float     iGlobalTime;           // shader playback time (in seconds)
-uniform float     iGlobalTimeDelta;      // render time (in seconds)
-uniform int       iFrame;                // shader playback frame
-uniform float     iChannelTime[4];       // channel playback time (in seconds)
-uniform vec3      iChannelResolution[4]; // channel resolution (in pixels)
-uniform vec4      iMouse;                // mouse pixel coords. xy: current (if MLB down), zw: click
-uniform vec4      iDate;                 // (year, month, day, time in seconds)
 
 mat2 rot( in float a ) {
 	float c = cos(a),
@@ -68,14 +62,14 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     c = mix(c, vec3(1.), r);
 
     // head - circle
-    uvE = uv * rot(0.);
-    uvE *= 14.0 / tAppearH;
-    uvE += vec2(.2, .2) * tOffsetH;
+    uvE = uv * 10.0 / tAppearH;
+    uvE += vec2(0., 1.) * tOffsetH;
+    uvE *= rot(it * 4);
     float amplitude = .1 * tshakeH;
     float ampSpeed = 20.;
     d = sdEllipsoid(uvE, vec2(
-    		1.5 + amplitude *cos(it * ampSpeed),
-    		1.5 + amplitude *sin(it * ampSpeed)
+		1.5 + amplitude * cos(it * ampSpeed),
+		1.5 + amplitude * sin(it * ampSpeed)
     ));
     float fluffyness = (1 + sin(it * .5)) * .2;
     r = smoothstep(.32 + fluffyness * tFluffyH, .30, d); // [0., 1.]
