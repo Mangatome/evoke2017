@@ -17,11 +17,11 @@ float sdEllipsoid( in vec2 p, in vec2 r )
     return (length( p/r ) - 1.0) * min(r.x,r.y);
 }
 
-float sdRay(in vec2 p, in float w, in float angle, in float l) {
+float sdRay(in vec2 p, in float width, in float angle, in float lgbth) {
 	float a = atan(p.y,p.x)/6.28318531;
 	float diff = abs(angle - a);
-	float ray = smoothstep(diff, diff + w * .5, w);
-	return ray * smoothstep(length(p), length(p) + w, l);
+	float ray = smoothstep(diff, diff + width * .5, width);
+	return ray * smoothstep(length(p), length(p) + width, lgbth);
 }
 
 float rd(vec2 p, float x) {
@@ -211,17 +211,17 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     // Mustaches
     float ms = sin(it / mustachePeriod) * mustacheAmplitude;
     vec2 uvrot = uv * rot(PI);
-    d = sdRay(uv + mustachePan, .005, mustacheAngles[0] + ms, mustacheLength * tAppearMR3);
+    d = sdRay(uv + mustachePan, .005, mustacheAngles.x + ms, mustacheLength * tAppearMR3);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uv + mustachePan, .005, mustacheAngles[1] + ms, mustacheLength * tAppearMR2);
+    d = sdRay(uv + mustachePan, .005, mustacheAngles.y + ms, mustacheLength * tAppearMR2);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uv + mustachePan, .005, mustacheAngles[2] + ms, mustacheLength * tAppearMR1);
+    d = sdRay(uv + mustachePan, .005, mustacheAngles.z + ms, mustacheLength * tAppearMR1);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[0] + ms, mustacheLength * tAppearML1);
+    d = sdRay(uvrot - mustachePan, .005, mustacheAngles.x + ms, mustacheLength * tAppearML1);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[1] + ms, mustacheLength * tAppearML2);
+    d = sdRay(uvrot - mustachePan, .005, mustacheAngles.y + ms, mustacheLength * tAppearML2);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[2] + ms, mustacheLength * tAppearML3);
+    d = sdRay(uvrot - mustachePan, .005, mustacheAngles.z + ms, mustacheLength * tAppearML3);
     c = mix(c, rabbitColor, d);
 
     // Swipe
