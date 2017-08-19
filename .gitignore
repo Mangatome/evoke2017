@@ -3,6 +3,7 @@ crinkler20/
 out/
 *.wav
 *.pkf
+*.mp3
 
 .metadata
 bin/
