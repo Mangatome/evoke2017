@@ -26,8 +26,8 @@ float sdEllipsoid( in vec2 p, in vec2 r )
 float sdRay(in vec2 p, in float width, in float angle, in float lgbth) {
 	float a = atan(p.y,p.x)/6.28318531;
 	float diff = abs(angle - a);
-	float ray = smoothstep(diff, diff + width * .5, width);
-	return ray * smoothstep(length(p), length(p) + width, lgbth);
+	float ray = smoothstep(diff, diff + width, width);
+	return ray * smoothstep(length(p), length(p) + width * 2, lgbth);
 }
 
 float rd(vec2 p, float x) {
@@ -75,11 +75,12 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	// Tweak here!
 	float shakeAmpSpeed = 20.;
 	float headSize = 1.5;
+	float growHFactor = .025;
 	float fluffynessH = .2;
 	float fluffynessLR = .02;
 	float fluffyPeriod = .5;
-	float swipePeriod = .5;
-	float swipeOffset = 0.;
+	float swipePeriod = .43;
+	float swipeOffset = .6;
 	float mustachePeriod = .5;
 	float mustacheAmplitude = 0.005;
 	float mustacheLength = .3;
@@ -107,15 +108,17 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tshakeH = smoothstep(0., 5., it) * smoothstep(13.6, 8., it);
     float tFluffyH = smoothstep(4., 6., it);
     float tRays = smoothstep(13., 17., it) * smoothstep(24., 20., it);
-    float tSwipes = step(13.6, it) * step(it, 20);
+    float tSwipes = step(13.4, it) * step(it, 20);
     float tOffsetH = smoothstep(22.3, 24., it);
-    float tAppearL = smoothstep(25., 25.7, it);
+    float tGrowH = smoothstep(24., 24.1, it);
+    float tReduceH = smoothstep(24.1, 24.6, it);
+    float tAppearL = smoothstep(25.4, 25.9, it);
     float tAppearR = smoothstep(27., 27.5, it);
     float tAppearML1 = smoothstep(30.4, 30.9, it);
-    float tAppearML2 = smoothstep(33.8, 34.3, it);
-    float tAppearML3 = smoothstep(37.3, 37.7, it);
     float tAppearMR1 = smoothstep(32.1, 32.6, it);
+    float tAppearML2 = smoothstep(33.8, 34.3, it);
     float tAppearMR2 = smoothstep(35.5, 36., it);
+    float tAppearML3 = smoothstep(37.3, 37.7, it);
     float tAppearMR3 = smoothstep(39., 39.5, it);
     float tPink = smoothstep(27.6, 29.1, it);
     float tExplode = smoothstep(39., 46.5, it);
@@ -210,7 +213,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     d = sdEllipsoid(uvx, headSize * vec2(
     		1 + amplitude * cos(it * shakeAmpSpeed),
 			1 + amplitude * sin(it * shakeAmpSpeed)
-    ));
+    ) * (1 + (tGrowH - tReduceH) * growHFactor));
     r = smoothstep(.32 + fluffyH * tFluffyH + .05 / tAppearH, .30, d); // [0., 1.]
     c = mix(c, rabbitColor, r);
 
