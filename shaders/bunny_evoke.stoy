@@ -69,7 +69,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	float fluffyPeriod = .5;
 	float swipePeriod = .5;
 	float swipeOffset = 0.;
-	vec2 mustachePan = vec2(0., .15);
+	float mustachePeriod = .5;
+	float mustacheAmplitude = 0.005;
+	vec2 mustachePan = vec2(0., .13);
 	vec3 mustacheAngles = vec3(-.02, 0, .02);
 	vec3 black = vec3(0., 0., 0.);
 	vec3 white = vec3(1., 1., 1.);
@@ -202,18 +204,19 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     c = mix(c, rabbitColor, r);
 
     // Mustaches
-    d = sdRay(uv + mustachePan, .005, mustacheAngles[0], .3 * tAppearMR3);
+    float ms = sin(it / mustachePeriod) * mustacheAmplitude;
+    d = sdRay(uv + mustachePan, .005, mustacheAngles[0] + ms, .3 * tAppearMR3);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uv + mustachePan, .005, mustacheAngles[1], .3 * tAppearMR2);
+    d = sdRay(uv + mustachePan, .005, mustacheAngles[1] + ms, .3 * tAppearMR2);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uv + mustachePan, .005, mustacheAngles[2], .3 * tAppearMR1);
+    d = sdRay(uv + mustachePan, .005, mustacheAngles[2] + ms, .3 * tAppearMR1);
     c = mix(c, rabbitColor, d);
     vec2 uvrot = uv * rot(PI);
-    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[0], .3 * tAppearML1);
+    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[0] + ms, .3 * tAppearML1);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[1], .3 * tAppearML2);
+    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[1] + ms, .3 * tAppearML2);
     c = mix(c, rabbitColor, d);
-    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[2], .3 * tAppearML3);
+    d = sdRay(uvrot - mustachePan, .005, mustacheAngles[2] + ms, .3 * tAppearML3);
     c = mix(c, rabbitColor, d);
 
     // Swipe
