@@ -30,8 +30,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec3 c = vec3(1., .2, .5);
 
     // Timeline
-    float appearL = smoothstep(.25, .75, iGlobalTime);
-    float appearR = smoothstep(1.25, 1.75, iGlobalTime);
+    float appearH = smoothstep(0., 5., iGlobalTime);
+    float fluffyH = smoothstep(4., 6., iGlobalTime);
+    float appearL = smoothstep(28.25, 28.75, iGlobalTime);
+    float appearR = smoothstep(29.25, 29.75, iGlobalTime);
 
     vec2 rext = vec2(.3, .8);
     vec2 rint = rext - .2;
@@ -62,10 +64,11 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     c = mix(c, vec3(1.), r);
 
     // head - circle
-    vec2 uvT = uv * 1.5;
-    uvT.y += 0.2;
+    vec2 uvT = uv * 1.5 / appearH;
+    uvT.y += 0.2 * appearH;
     d = length(uvT);
-    r = smoothstep(.31, .30, d); // [0., 1.]
+    float fluffyness = (1 + sin(iGlobalTime * .5)) * .1;
+    r = smoothstep(.31 + fluffyness * fluffyH, .30, d); // [0., 1.]
     c = mix(c, vec3(1.), r);
 
 	fragColor = vec4(c, 1.);
