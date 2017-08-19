@@ -46,8 +46,8 @@ vec3 hsv(vec3 c) {
     return c.z*mix(k.xxx,clamp(p-k.xxx,0.,1.),c.y);
 }
 
-float swipe( in float period, in float bmin, in float bmax ) {
-    float s = 2. * max(mod(iGlobalTime, 2. * period) - period, 0.) - period;
+float swipe( in float period, in float bmin, in float bmax, float offset ) {
+    float s = 2. * max(mod(iGlobalTime + offset, 2. * period) - period, 0.) - period;
     //return s;
     return (((s / period) + 1.) * .5 * (bmax - bmin)) + bmin;
 }
@@ -61,6 +61,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	float fluffynessH = .2;
 	float fluffynessLR = .02;
 	float fluffyPeriod = .5;
+	float swipePeriod = .5;
+	float swipeOffset = 0.;
 	vec3 black = vec3(0., 0., 0.);
 	vec3 white = vec3(1., 1., 1.);
 	vec3 pink = vec3(1., 0.58, 0.75);
@@ -185,7 +187,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     c = mix(c, rabbitColor, r);
 
     // Swipe
-    uvx = uv + swipe(1., 2., -2.);
+    uvx = uv + swipe(swipePeriod, 2., -2., swipeOffset);
     d = sdStrip(uvx, 0.3, 1.);
     r = smoothstep(E + 0.05, E, d);
     vec3 invertColor = (1. - c) * pink;
