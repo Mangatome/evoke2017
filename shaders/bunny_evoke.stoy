@@ -98,13 +98,14 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     // Rays
     float nr = 400.;
-    vec2 uvr = uv + rabbitPan / 8;
-    float ang=atan(uvr.y,uvr.x)/6.28318531*nr+(rand(uvr)-.5)*it;
-    float ns=noise(vec2(ang,it*rand(uvr)),nr);
+    vec2 uvr = uv + rabbitPan / 10;
+    float ruvr = rand(uvr * it);
+    float ang=atan(uvr.y,uvr.x)/6.28318531*nr+(ruvr-.5)*it;
+    float ns=noise(vec2(ang,it*ruvr),nr);
     vec3 cex = c + .1
     		* ns/length(uvr)
 			* hsv(vec3(1.,.5,1.2))
-			* step(length(uvr), mix(.35, .45, rand(uvr)));
+			* step(length(uvr), mix(.35, .45, ruvr));
     c = mix(c, cex, tRays);
 
     // Ear size
