@@ -2,6 +2,7 @@ node_modules/
 crinkler20/
 out/
 *.wav
+*.pkf
 
 .metadata
 bin/
