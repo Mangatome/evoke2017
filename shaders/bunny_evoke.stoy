@@ -12,6 +12,35 @@ float sdEllipsoid( in vec2 p, in vec2 r )
     return (length( p/r ) - 1.0) * min(r.x,r.y);
 }
 
+float rd(vec2 p, float x) {
+    p.x=mod(p.x,x);
+    return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453123);
+}
+
+float rand(vec2 p){
+    return fract(sin(dot(p ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+float noise(vec2 uv, float x) {
+    vec2 iuv=floor(uv),
+        fuv=smoothstep(0.,1.,fract(uv)),
+        oi=vec2(0.,1.);
+    float n00=rd(iuv,x),
+        n01=rd(iuv+oi.xy,x),
+        n10=rd(iuv+oi.yx,x),
+        n11=rd(iuv+oi.yy,x);
+    return mix(
+        mix(n00,n10,fuv.x),
+        mix(n01,n11,fuv.x),
+        fuv.y);
+}
+
+vec3 hsv(vec3 c) {
+    vec4 k=vec4(1.,2./3.,1./3.,3.);
+    vec3 p=abs(fract(c.xxx+k.xyz)*4.-k.www);
+    return c.z*mix(k.xxx,clamp(p-k.xxx,0.,1.),c.y);
+}
+
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
 	// Constants
@@ -36,6 +65,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tAppearH = smoothstep(0., 5., it);
     float tshakeH = smoothstep(0., 5., it) * smoothstep(28., 20., it);
     float tFluffyH = smoothstep(4., 6., it);
+    float tRays = smoothstep(15., 20., it) * smoothstep(35., 33., it);
     float tOffsetH = smoothstep(20., 28., it);
     float tAppearL = smoothstep(28.25, 28.75, it);
     float tAppearR = smoothstep(29.25, 29.75, it);
@@ -54,13 +84,27 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     // Zoom scene
     uv *= 1 - tExplode * 1 + scene2;
 
-    // Pan scene
+    // Pan Daddy
+    vec2 rabbitPan = vec2(0., 1.) * tOffsetH;
+
+    // Pan Rabby
     uv += scene2 * mix(vec2(.3, 1.), vec2(.2, .55), tShowRaby - tHideRaby);
     uv = uv * scene1 + uv * rot(PI * -.1) * scene2;
 
     // Background color
     vec3 c = mix(black, vec3(1., .2, .5), tPink);
     c = mix(c, white, scene2);
+
+    // Rays
+    float nr = 400.;
+    vec2 uvr = uv + rabbitPan / 8;
+    float ang=atan(uvr.y,uvr.x)/6.28318531*nr+(rand(uvr)-.5)*it;
+    float ns=noise(vec2(ang,it*rand(uvr)),nr);
+    vec3 cex = c + .1
+    		* ns/length(uvr)
+			* hsv(vec3(1.,.5,1.2))
+			* step(length(uvr), mix(.35, .45, rand(uvr)));
+    c = mix(c, cex, tRays);
 
     // Ear size
     vec2 rext = vec2(.3, .8);
@@ -97,7 +141,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     // head - circle
     uvx = uv * 10.0 / tAppearH;
-    uvx += vec2(0., 1.) * tOffsetH;
+    uvx += rabbitPan;
     uvx *= rot(it * 4);
     float amplitude = .1 * tshakeH;
     d = sdEllipsoid(uvx, headSize * vec2(
