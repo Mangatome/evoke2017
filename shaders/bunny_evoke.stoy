@@ -17,11 +17,11 @@ float sdEllipsoid( in vec2 p, in vec2 r )
     return (length( p/r ) - 1.0) * min(r.x,r.y);
 }
 
-float sdRay(in vec2 p, in float width, in float angle, in float length) {
+float sdRay(in vec2 p, in float width, in float angle, in float lgbth) {
 	float a = atan(p.y,p.x)/6.28318531;
 	float diff = abs(angle - a);
 	float ray = smoothstep(diff, diff + width * .5, width);
-	return ray * smoothstep(length(p), length(p) + width, length);
+	return ray * smoothstep(length(p), length(p) + width, lgbth);
 }
 
 float rd(vec2 p, float x) {
