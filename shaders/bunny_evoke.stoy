@@ -38,8 +38,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tAppearL = smoothstep(28.25, 28.75, it);
     float tAppearR = smoothstep(29.25, 29.75, it);
     float tPink = smoothstep(31., 32., it);
-    float tExplode = smoothstep(35., 37., it);
-    float tShowRab = smoothstep(37., 38., it);
+    float tExplode = smoothstep(33., 35., it);
+    float tShowRaby = smoothstep(36., 37., it);
+    float tHideRaby = smoothstep(38., 39., it);
 
     // Scene management
     float scene2 = step(1, tExplode);
@@ -52,7 +53,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     uv *= 1 - tExplode * 1 + scene2;
 
     // Pan scene
-    uv += vec2(.2, .55) * scene2;
+    uv += scene2 * mix(vec2(.3, 1.), vec2(.2, .55), tShowRaby - tHideRaby);
     uv = uv * scene1 + uv * rot(PI * -.1) * scene2;
 
     // Background color
