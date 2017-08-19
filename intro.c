@@ -701,7 +701,7 @@ static __forceinline void renderAudio()
                 {
 					float t = (float)channels[j].frame;
 					float phase = TAU * t / (float)channels[j].period;
-					float sf = instruments[channels[j].instrument & 0x0f](t, phase);
+					float sf = instruments[channels[j].instrument & 0x0f](t, phase) * 0.8f;
                     short s = (short)((int)(sf * 32767.0f)/* * 3 / 4*/);
                     short l = (channels[j].instrument & 0x80) ? s : 0;
                     short r = (channels[j].instrument & 0x40) ? s : 0;
@@ -832,7 +832,7 @@ void entry()
         if (((float)frameNumber / 60.0f) > (AUDIO_SAMPLES / 2 / 44100.0f))
             break;
 #else
-        time = (float)(timeGetTime() - startTime) * 0.001f * 140.0f / 60.0f;
+		time = (float)(timeGetTime() - startTime) * 0.001f; //* 140.0f / 60.0f;
 #endif
         
 		//time += 164.0f;
