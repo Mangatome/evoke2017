@@ -73,6 +73,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tExplode = smoothstep(33., 35., it);
     float tShowRaby = smoothstep(36., 37., it);
     float tHideRaby = smoothstep(38., 39., it);
+    float tFadeOut = smoothstep(39.5, 40., it);
 
     // Scene management
     float scene2 = step(1, tExplode);
@@ -150,6 +151,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     ));
     r = smoothstep(.32 + fluffyH * tFluffyH, .30, d); // [0., 1.]
     c = mix(c, rabbitColor, r);
+
+    // Fade out
+    c = mix(c, black, tFadeOut);
 
     // return
 	fragColor = vec4(c, 1.);
