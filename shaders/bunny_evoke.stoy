@@ -72,8 +72,8 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 	float fluffynessH = .2;
 	float fluffynessLR = .02;
 	float fluffyPeriod = .5;
-	float swipePeriod = .5;
-	float swipeOffset = 0.;
+	float swipePeriod = .43;
+	float swipeOffset = .6;
 	float mustachePeriod = .5;
 	float mustacheAmplitude = 0.005;
 	float mustacheLength = .3;
@@ -101,7 +101,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tshakeH = smoothstep(0., 5., it) * smoothstep(13.6, 8., it);
     float tFluffyH = smoothstep(4., 6., it);
     float tRays = smoothstep(13., 17., it) * smoothstep(24., 20., it);
-    float tSwipes = step(13.6, it) * step(it, 20);
+    float tSwipes = step(13.4, it) * step(it, 20);
     float tOffsetH = smoothstep(22.3, 24., it);
     float tAppearL = smoothstep(25., 25.7, it);
     float tAppearR = smoothstep(27., 27.5, it);
