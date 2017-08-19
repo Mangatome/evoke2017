@@ -1,0 +1,76 @@
+//! FRAGMENT
+
+uniform float _u[UNIFORM_COUNT];
+
+#define iResolution vec3(_u[4], _u[5], 0.)
+#define iGlobalTime _u[0]
+
+//-------- stoy below
+
+mat2 rot( in float a ) {
+	float c = cos(a),
+        s = sin(a);
+    return mat2(c, s, -s, c);
+}
+
+float sdEllipsoid( in vec2 p, in vec2 r )
+{
+    return (length( p/r ) - 1.0) * min(r.x,r.y);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord.xy / iResolution.xy;
+
+    // aspect x
+    uv -= 0.5;
+    uv.x *= iResolution.x / iResolution.y;
+
+    // background
+    vec3 c = vec3(1., .2, .5);
+
+    // right ear - ellipsoid inner + outer
+    vec2 rext = vec2(.3, .8),
+        rint = rext - .2;
+    float angle = 0.5 + (0.035 + 0.05 * cos(iGlobalTime + 1.));
+    vec2 uvE = rot(angle) * uv;
+    uvE *= 4.0;
+    uvE += vec2(-0.2, -0.7);
+    float d = sdEllipsoid(uvE, rint);
+    float r = step(d, 0.);
+    c = mix(c, vec3(1., 0.58, 0.75), r);
+    d = max(sdEllipsoid(uvE, rext), -d);
+    r = smoothstep(.01, .0, d);
+    c = mix(c, vec3(1.), r);
+
+    // left ear - ellipsoid inner + outer
+    angle = 0.37 + (0.05 + 0.05 * sin(iGlobalTime * 1.05));
+    vec2 uvEb = uv * rot(angle);
+    uvEb *= 4.0;
+    uvEb += vec2(0.2, -0.7);
+    d = sdEllipsoid(uvEb, rint);
+    r = step(d, 0.);
+    c = mix(c, vec3(1., 0.58, 0.75), r);
+    d = max(sdEllipsoid(uvEb, rext), -d);
+    r = smoothstep(.01, .0, d);
+    c = mix(c, vec3(1.), r);
+
+    // head - circle
+    vec2 uvT = uv * 1.5;
+    uvT.y += 0.2;
+    d = length(uvT);
+    r = smoothstep(.31, .30, d); // [0., 1.]
+    c = mix(c, vec3(1.), r);
+
+	fragColor = vec4(c, 1.);
+}
+
+//-------- stoy above
+
+void main(void) {
+	vec4 color;
+	mainImage(color, gl_FragCoord.xy);
+
+	color.w = 1.0;
+	gl_FragColor = color;
+}
