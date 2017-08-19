@@ -168,9 +168,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     // Swipe
     uvx = uv + swipe(1., 2., -2.);
-    d = sdStrip(uvx, 0.3, 2.);
+    d = sdStrip(uvx, 0.3, 1.);
     r = smoothstep(E + 0.05, E, d);
-    c = mix(c, mix(c, 1. - c, r), tSwipes);
+    vec3 invertColor = (1. - c) * pink;
+    c = mix(c, mix(c, invertColor, r), tSwipes);
 
     // Fade out
     c = mix(c, black, tFadeOut);
