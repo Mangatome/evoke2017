@@ -7,6 +7,11 @@ mat2 rot( in float a ) {
     return mat2(c, s, -s, c);
 }
 
+float sdStrip( in vec2 uv, in float angle, in float size ) {
+	vec2 uvS = 10. * rot(angle) * uv;
+    return max(uv.x - uvS.x - size, -uv.x + uvS.x - size);
+}
+
 float sdEllipsoid( in vec2 p, in vec2 r )
 {
     return (length( p/r ) - 1.0) * min(r.x,r.y);
@@ -41,6 +46,12 @@ vec3 hsv(vec3 c) {
     return c.z*mix(k.xxx,clamp(p-k.xxx,0.,1.),c.y);
 }
 
+float swipe( in float period, in float bmin, in float bmax ) {
+    float s = 2. * max(mod(iGlobalTime, 2. * period) - period, 0.) - period;
+    //return s;
+    return (((s / period) + 1.) * .5 * (bmax - bmin)) + bmin;
+}
+
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
 	// Constants
@@ -56,6 +67,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
 	float it = iGlobalTime;
 	vec2 uv = fragCoord.xy / iResolution.xy;
+	float E = 1./iResolution.y;
 
     // aspect x
     uv -= 0.5;
@@ -66,6 +78,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tshakeH = smoothstep(0., 5., it) * smoothstep(28., 20., it);
     float tFluffyH = smoothstep(4., 6., it);
     float tRays = smoothstep(15., 20., it) * smoothstep(35., 33., it);
+    float tSwipes = step(15., it) * step(it, 28.5);
     float tOffsetH = smoothstep(20., 28., it);
     float tAppearL = smoothstep(28.25, 28.75, it);
     float tAppearR = smoothstep(29.25, 29.75, it);
@@ -152,6 +165,12 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     ));
     r = smoothstep(.32 + fluffyH * tFluffyH, .30, d); // [0., 1.]
     c = mix(c, rabbitColor, r);
+
+    // Swipe
+    uvx = uv + swipe(1., 2., -2.);
+    d = sdStrip(uvx, 0.3, 2.);
+    r = smoothstep(E + 0.05, E, d);
+    c = mix(c, mix(c, 1. - c, r), tSwipes);
 
     // Fade out
     c = mix(c, black, tFadeOut);
