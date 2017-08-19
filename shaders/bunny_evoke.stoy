@@ -40,6 +40,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     float tShowRab = smoothstep(37., 38., it);
 
     float scene2 = step(1, tExplode);
+    float scene1 = 1 - scene2;
+
+    vec3 rabbitColor = white * scene1 + pink * scene2;
+    vec3 earColor = pink * scene1 + white * scene2;
 
     uv *= 1 - tExplode * 1 + scene2;
 
@@ -58,10 +62,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     uvx += vec2(-0.2, -0.7) * tAppearR;
     float d = sdEllipsoid(uvx, rint * tAppearR);
     float r = step(d, 0.);
-    c = mix(c, pink, r * tAppearR);
+    c = mix(c, earColor, r * tAppearR);
     d = max(sdEllipsoid(uvx, rext * tAppearR), -d);
     r = smoothstep(.01, .0, d);
-    c = mix(c, white, r);
+    c = mix(c, rabbitColor, r);
 
     // left ear - ellipsoid inner + outerx
     angle = 0.37 + (0.05 + 0.05 * sin(it * 1.05));
@@ -70,10 +74,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     uvx += vec2(0.2, -0.7) * tAppearL;
     d = sdEllipsoid(uvx, rint * tAppearL);
     r = step(d, 0.);
-    c = mix(c, pink, r * tAppearL);
+    c = mix(c, earColor, r * tAppearL);
     d = max(sdEllipsoid(uvx, rext * tAppearL), -d);
     r = smoothstep(.01, .0, d);
-    c = mix(c, white, r);
+    c = mix(c, rabbitColor, r);
 
     // head - circle
     uvx = uv * 10.0 / tAppearH;
@@ -86,7 +90,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     ));
     float fluffyH = (1 + sin(it * .5)) * fluffyness;
     r = smoothstep(.32 + fluffyH * tFluffyH, .30, d); // [0., 1.]
-    c = mix(c, white, r);
+    c = mix(c, rabbitColor, r);
 
     // Small rabbit
 
