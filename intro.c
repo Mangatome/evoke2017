@@ -83,7 +83,7 @@ static PIXELFORMATDESCRIPTOR pfd = {
 #define TRACKER_SONG_LENGTH 40 // in patterns
 #define AUDIO_SAMPLES (TRACKER_PERIOD * TRACKER_PATTERN_LENGTH * TRACKER_SONG_LENGTH * 2)
 
-#define AUDIO_DEBUG
+//#define AUDIO_DEBUG
 
 static const unsigned int riffHeader[11] = {
     0x46464952, /* RIFF */
