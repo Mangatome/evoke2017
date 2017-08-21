@@ -1,4 +1,4 @@
-# evoke2017
+# 20 _ears
 A 4k demo released at Evoke 2017, titled "20 _ears"
 
 ## Building
