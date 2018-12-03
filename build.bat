@@ -2,6 +2,7 @@
 
 call "%VS140COMNTOOLS%\..\..\VC\vcvarsall.bat" x86
 
+if not exist out mkdir out
 del /q out\*
 node node_modules\glsl-unit\bin\template_glsl_compiler.js --input=shader.glsl --variable_renaming=INTERNAL --output=out\shader.min.glsl
 node build-shader-header.js
